@@ -2,7 +2,7 @@
 
 extern void send_char_morse(char c);
 
-int sendChars(const unsigned char *buf, unsigned len, void (*char_receiver)(char));
+int sendChars(const unsigned char *buf, unsigned len, void (*char_sender)(char));
 
 FILEHANDLE _sys_open(const char *name, int openmode) {
 	if(strncmp(name, ":STDIN", 6) == 0){
@@ -42,8 +42,8 @@ int _sys_write(FILEHANDLE fh, const unsigned char *buf, unsigned len, int mode) 
 	
 	if(fh == FH_STDOUT || fh == FH_MORSE){
 		
-		void (*char_receiver)(char) = ((fh == FH_STDOUT) ? &sendchar_USART2 : &send_char_morse);
-		return sendChars(buf, len, char_receiver);
+		void (*char_sender)(char) = ((fh == FH_STDOUT) ? &sendchar_USART2 : &send_char_morse);
+		return sendChars(buf, len, char_sender);
 		
 	}
 	else{
@@ -80,9 +80,9 @@ void sendchar_USART2(char c){
 	USART2->DR = c; //(c & 0xFF);
 }
 
-int sendChars(const unsigned char *buf, unsigned len, void (*char_receiver)(char)){
+int sendChars(const unsigned char *buf, unsigned len, void (*char_sender)(char)){
 	while(len){
-			char_receiver(*buf);
+			char_sender(*buf);
 			//sendchar_USART2(*buf);
 			len--;
 			buf++;
